@@ -1,0 +1,58 @@
+// josie 12 may 2023
+
+// this macro is to visualize the separations between the telescopes in 3D, and their distance vectors from the reference point for lat/long and alt/az of the array
+
+// telLocs      = np.array([[135.48, -8.61, 12.23],[44.1, -47.7, 4.4],[29.4, 60.1, 9.8],[-35.9, 11.3, 7.0]])
+
+void tbaselines(){
+
+  TCanvas* c1 = new TCanvas("","",800,600);
+  TGraph2D* asiipCoords = new TGraph2D();
+  asiipCoords->SetTitle("Telescope positions relative to reference point (0,0,0);E/W;N/S");
+  asiipCoords->SetMarkerStyle(20);
+  asiipCoords->SetMarkerColor(4);
+  double tx[5] = {0, 135.48, 44.1, 29.4, -35.9};
+  double ty[5] = {0, -8.61, -47.7, 60.1, 11.3};
+  double tz[5] = {0, 12.23, 4.4, 9.8, 7.0};
+
+  TGraph2D* nolanCoords = new TGraph2D();
+  nolanCoords->SetMarkerStyle(20);
+  nolanCoords->SetMarkerColor(2);
+  double tx2[5] = {0, 135.49, 45.145, 28.86, -36.112};
+  double ty2[5] = {0, -8.72, -49.115, 60.73, 12.696};
+  double tz2[5] = {0, 7.23, -0.94, 4.51, 1.63};
+
+  TGraph2D* newCoords = new TGraph2D(); // these are the coords dave measured ~early aug 2023 to cm precision
+  newCoords->SetMarkerStyle(20);
+  newCoords->SetMarkerColor(3);
+  double tx3[5] = {0, 135.48, 44.836, 29.335, -35.885};
+  double ty3[5] = {0, -8.61, -49.601, 60.022, 11.742};
+  double tz3[5] = {0, 12.25, 5.103, 10.636, 6.419};
+
+  for (int i=0; i<5; i++){
+    asiipCoords->AddPoint(tx[i],  ty[i],  tz[i]);
+    nolanCoords->AddPoint(tx2[i], ty2[i], tz2[i]+5.0); // added +5 for nolan bc they are -5 less height than the others
+    newCoords->AddPoint(tx3[i], ty3[i], tz3[i]);
+  }
+
+  asiipCoords->Draw("AP"); // to John - try different draw options, incl. Draw("SURF2Z"), ("COLZ"),
+  nolanCoords->Draw("PSAME");
+  newCoords->Draw("PSAME");
+
+  TCanvas* c2 = new TCanvas("","",800,600);
+  TGraph* asiipflat = new TGraph(5,tx,ty);    asiipflat->SetMarkerStyle(20);   asiipflat->SetMarkerColor(4);
+  TGraph* nolanflat = new TGraph(5,tx2,ty2);  nolanflat->SetMarkerStyle(20);   nolanflat->SetMarkerColor(2);
+  TGraph* newflat = new TGraph(5,tx3,ty3);    newflat->SetMarkerStyle(20);     newflat->SetMarkerColor(3);
+
+  asiipflat->SetTitle(";E-W (m);N-S (m)");
+  TLegend* legendflat = new TLegend(0.65,0.75,0.9,0.9);
+  legendflat->AddEntry(asiipflat,"ASIIP positions","P");
+  legendflat->AddEntry(nolanflat,"Nolan positions","P");
+  legendflat->AddEntry(newflat,"New positions","P");
+
+  asiipflat->Draw("AP");
+  nolanflat->Draw("PSAME");
+  newflat->Draw("PSAME");
+  legendflat->Draw("SAME");
+
+}
